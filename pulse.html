@@ -215,9 +215,23 @@
         let totalCards = 0;
 
         function initFeed() {
-            const fullDeck = JSON.parse(localStorage.getItem('catalyst_deck')) || [];
-            activeDeck = fullDeck.filter(card => !card.mastered);
-            totalCards = activeDeck.length;
+        
+    // 1. Load deck from storage
+    const fullDeck = JSON.parse(localStorage.getItem('catalyst_deck')) || [];
+    
+    // 2. Read the active filter from the Hub
+    const activeFilter = localStorage.getItem('catalyst_filter') || 'All';
+    
+    // 3. Filter out mastered cards AND apply the subject filter
+    activeDeck = fullDeck.filter(card => {
+        const isNotMastered = !card.mastered;
+        const matchesFilter = (activeFilter === 'All') || (card.subject === activeFilter);
+        return isNotMastered && matchesFilter;
+    );
+    
+    totalCards = activeDeck.length;
+
+    // ... [The rest of your existing initFeed code stays exactly the same] ...
 
             const feed = document.getElementById('feed');
 
