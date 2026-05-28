@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Nova | Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#1a1209">
+        <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        :root {
+            --bg: #080808;
+            --card: #111111;
+            --accent: linear-gradient(135deg, #00ff87 0%, #00b4d8 100%);
+            --text-p: #f5f5f5;
+            --text-s: #666666;
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text-p);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 40px 24px calc(100px + var(--safe-bottom)); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header { width: 100%; margin-bottom: 30px; }
+        .logo { font-size: 0.55rem; letter-spacing: 5px; color: var(--text-s); text-transform: uppercase; margin-bottom: 6px; }
+        h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        /* Progress Ring */
+        .progress-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0 30px;
+        }
+
+        svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        
+        .circle-bg { fill: none; stroke: rgba(255,255,255,0.03); stroke-width: 14; }
+        .circle-progress {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 14;
+            stroke-linecap: round;
+            stroke-dasharray: 628; 
+            stroke-dashoffset: 628; /* Starts completely empty */
+            transition: stroke-dashoffset 1.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .ring-content { position: absolute; text-align: center; }
+        .ring-content h2 { font-size: 3.2rem; font-weight: 700; line-height: 1; }
+        .ring-content p { font-size: 0.65rem; color: var(--text-s); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .stat-label { font-size: 0.55rem; text-transform: uppercase; color: var(--text-s); letter-spacing: 1px; display: block; margin-bottom: 6px; }
+        .stat-val { font-size: 1.1rem; font-weight: 700; color: #fff; }
+
+        /* Action Button */
+        .btn-start {
+            width: 100%;
+            margin-top: auto; 
+            padding: 20px;
+            border-radius: 18px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 255, 135, 0.15);
+        }
+
+        .btn-start:active { transform: scale(0.97); opacity: 0.9; }
+
+        /* Bottom Tab Bar */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 16px 32px calc(12px + var(--safe-bottom));
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+
+        /* System Footer */
+        .sys-footer {
+            width: 100%;
+            text-align: center;
+            padding: 40px 0 10px;
+            margin-top: auto; /* Pushes it to the bottom of the flex container */
+            font-size: 0.55rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-s);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.5;
+        }
+
+        .nav-item { 
+            color: var(--text-s); 
+            text-decoration: none; 
+            font-size: 0.6rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
+            transition: 0.3s;
+        }
+        
+        .nav-item.active { color: #00ff87; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">NOVA</div>
+        <h1>System Hub</h1>
+    </header>
+
+    <div class="progress-container">
+        <svg>
+            <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00ff87" />
+                    <stop offset="100%" stop-color="#00b4d8" />
+                </linearGradient>
+            </defs>
+            <circle class="circle-bg" cx="120" cy="120" r="100"></circle>
+            <circle class="circle-progress" id="progress-circle" cx="120" cy="120" r="100"></circle>
+        </svg>
+        <div class="ring-content">
+            <h2 id="mastery-count">0</h2>
+            <p>Mastered</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Current Streak</span>
+            <span class="stat-val">0 Days</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Accuracy</span>
+            <span class="stat-val">0%</span>
+        </div>
+    </div>
+
+    <button class="btn-start" onclick="window.location.href='feed.html'">INITIATE FEED</button>
+
+    <footer class="sys-footer">
+        &copy; <span id="current-year"></span> NOVA. ALL RIGHTS RESERVED. CREATED BY MANMATH.
+    </footer>
+   
+    <nav>
+        <a href="#" class="nav-item active">Hub</a>
+        <a href="forge.html" class="nav-item">Forge</a>
+        <a href="vault.html" class="nav-item">Vault</a>
+        <a href="pulse.html" class="nav-item">Pulse</a>
+    </nav>
+
+    <script>
+        window.onload = () => {
+            const current = 0; // Starts at 0
+            const target = 100; // Daily target
+            const circle = document.getElementById('progress-circle');
+            const circumference = 2 * Math.PI * 100; // 628.318
+            
+            // Calculate the offset. At 0, the offset equals the circumference (empty).
+            const offset = circumference - (current / target) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+        document.getElementById('current-year').innerText = new Date().getFullYear();
+    </script>
+</body>
+</html>

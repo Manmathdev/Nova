@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Nova | Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#1a1209">
+        <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        :root {
+            --bg: #080808;
+            --card: #111111;
+            --accent: linear-gradient(135deg, #00ff87 0%, #00b4d8 100%);
+            --accent-solid: #00ff87;
+            --text-p: #f5f5f5;
+            --text-s: #666666;
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text-p);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 40px 24px calc(100px + var(--safe-bottom)); 
+            display: flex;
+            flex-direction: column;
+        }
+
+        header { width: 100%; margin-bottom: 30px; text-align: center; }
+        .logo { font-size: 0.55rem; letter-spacing: 5px; color: var(--text-s); text-transform: uppercase; margin-bottom: 6px; }
+        h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        /* Form Container */
+        .forge-form {
+            background: var(--card);
+            padding: 24px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Subject Tagger */
+        .tag-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tag-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-s);
+            padding: 12px 0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag-btn.active {
+            background: rgba(0, 255, 135, 0.1);
+            color: var(--accent-solid);
+            border-color: var(--accent-solid);
+        }
+
+        /* Inputs */
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .input-group label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-s); font-weight: 600; }
+        
+        input, textarea {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            padding: 16px;
+            color: var(--text-p);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+
+        textarea { resize: none; min-height: 120px; line-height: 1.5; }
+        
+        input:focus, textarea:focus { border-color: var(--accent-solid); }
+
+        /* Action Button */
+        .btn-forge {
+            width: 100%;
+            margin-top: 10px;
+            padding: 20px;
+            border-radius: 16px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 255, 135, 0.15);
+            transition: transform 0.2s;
+        }
+
+        .btn-forge:active { transform: scale(0.97); }
+
+        /* Success Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 255, 135, 0.15);
+            border: 1px solid var(--accent-solid);
+            color: var(--accent-solid);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            z-index: 200;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Bottom Tab Bar */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 16px 32px calc(12px + var(--safe-bottom));
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+
+        /* System Footer */
+        .sys-footer {
+            width: 100%;
+            text-align: center;
+            padding: 40px 0 10px;
+            margin-top: auto; /* Pushes it to the bottom of the flex container */
+            font-size: 0.55rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-s);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.5;
+        }
+
+        .nav-item { color: var(--text-s); text-decoration: none; font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
+        .nav-item.active { color: #00ff87; }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">Card Forged Successfully</div>
+
+    <header>
+        <div class="logo">Nova</div>
+        <h1>The Forge</h1>
+    </header>
+
+    <div class="forge-form">
+        <div class="tag-group" id="subject-tags">
+            <button class="tag-btn active" onclick="setSubject(this, 'Physics')">Physics</button>
+            <button class="tag-btn" onclick="setSubject(this, 'Chemistry')">Chem</button>
+            <button class="tag-btn" onclick="setSubject(this, 'Maths')">Maths</button>
+            <button class="tag-btn" onclick="setSubject(this, 'IT')">IT</button>
+        </div>
+
+        <div class="input-group">
+            <label>Concept / Formula</label>
+            <input type="text" id="front-input" placeholder="e.g. Gauss's Law" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label>Derivation / Explanation</label>
+            <textarea id="back-input" placeholder="Enter the underlying logic, derivations, or exceptions here..."></textarea>
+        </div>
+
+        <button class="btn-forge" onclick="forgeCard()">FORGE DATA</button>
+    </div>
+
+    <footer class="sys-footer">
+        &copy; <span id="current-year"></span> NOVA. ALL RIGHTS RESERVED. CREATED BY MANMATH.
+    </footer>
+
+    <nav>
+        <a href="index.html" class="nav-item">Hub</a>
+        <a href="#" class="nav-item active">Forge</a>
+        <a href="vault.html" class="nav-item">Vault</a>
+        <a href="pulse.html" class="nav-item">Pulse</a>
+    </nav>
+
+    <script>
+        let currentSubject = "Physics";
+
+        // Handle Tag Selection
+        function setSubject(btn, subject) {
+            document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSubject = subject;
+        }
+
+        // Handle Saving to LocalStorage
+        function forgeCard() {
+            const front = document.getElementById('front-input').value.trim();
+            const back = document.getElementById('back-input').value.trim();
+
+            if(!front || !back) {
+                alert("Both fields are required to forge a card.");
+                return;
+            }
+
+            // Fetch existing deck or create new
+            let deck = JSON.parse(localStorage.getItem('catalyst_deck')) || [];
+            
+            // Create new card object
+            const newCard = {
+                id: Date.now(), // Unique identifier
+                subject: currentSubject,
+                q: front,
+                a: back,
+                mastered: false
+            };
+
+            // Save and update
+            deck.push(newCard);
+            localStorage.setItem('catalyst_deck', JSON.stringify(deck));
+
+            // Clear UI
+            document.getElementById('front-input').value = '';
+            document.getElementById('back-input').value = '';
+            document.getElementById('front-input').focus();
+
+            showToast();
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+        document.getElementById('current-year').innerText = new Date().getFullYear();
+    </script>
+</body>
+</html>

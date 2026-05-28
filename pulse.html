@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Catalyst | Feed</title>
+    <link rel="manifest" href="manifest.json">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#1a1209">
+        <link rel="apple-touch-icon" href="icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808;
+            --card: #111111;
+            --accent: linear-gradient(135deg, #00ff87 0%, #00b4d8 100%);
+            --accent-solid: #00ff87;
+            --text-p: #f5f5f5;
+            --text-s: #666666;
+            --safe-top: env(safe-area-inset-top);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text-p);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden; 
+        }
+
+        /* Minimalist Escape Hatch (Back Button) */
+        .btn-back {
+            position: fixed;
+            top: calc(20px + var(--safe-top));
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-s);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            z-index: 100;
+            opacity: 0.5;
+            transition: opacity 0.3s, transform 0.2s;
+        }
+
+        .btn-back:active {
+            transform: scale(0.9);
+            opacity: 1;
+        }
+
+        .btn-back svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* The Vertical Feed Container */
+        .feed-container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+        .feed-container::-webkit-scrollbar { display: none; }
+
+        /* Card Section */
+        .card-session {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            perspective: 1200px; 
+        }
+
+        /* The 3D Flip Card */
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 75vh;
+            transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card-inner.is-flipped { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 32px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            border-color: rgba(0, 255, 135, 0.3);
+        }
+
+        /* Content Styling */
+        .category {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-solid);
+            font-weight: 700;
+            position: absolute;
+            top: 40px;
+        }
+
+        .formula {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .derivation-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #dcdcdc;
+        }
+
+        .hint {
+            font-size: 0.7rem;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: absolute;
+            bottom: 40px;
+        }
+
+        /* Mastery Glow Effect */
+        .mastered-flash {
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            opacity: 0;
+            border-radius: 32px;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .mastered-flash.active { opacity: 0.8; }
+
+        /* Empty State */
+        .empty-state {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state h2 { font-size: 2rem; margin-bottom: 10px; background: var(--accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .empty-state p { color: var(--text-s); margin-bottom: 30px; font-size: 0.9rem; }
+        
+        .btn-hub {
+            padding: 16px 32px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-p);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back" aria-label="Return to Hub">
+        <svg viewBox="0 0 24 24">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+
+    <div class="feed-container" id="feed">
+        </div>
+
+    <script>
+        let activeDeck = [];
+        let totalCards = 0;
+
+        function initFeed() {
+            const fullDeck = JSON.parse(localStorage.getItem('catalyst_deck')) || [];
+            activeDeck = fullDeck.filter(card => !card.mastered);
+            totalCards = activeDeck.length;
+
+            const feed = document.getElementById('feed');
+
+            if (totalCards === 0) {
+                document.querySelector('.btn-back').style.display = 'none'; // Hide back button on empty state to keep it clean
+                feed.innerHTML = `
+                    <div class="empty-state">
+                        <h2>Zone Cleared</h2>
+                        <p>No active concepts remaining. You have mastered your current deck.</p>
+                        <a href="index.html" class="btn-hub">Return to Hub</a>
+                    </div>
+                `;
+                return;
+            }
+
+            activeDeck = activeDeck.sort(() => Math.random() - 0.5);
+
+            feed.innerHTML = activeDeck.map((card, index) => `
+                <section class="card-session" id="section-${index}">
+                    <div class="flip-card-inner" id="card-${index}" 
+                         onclick="handleInteraction(event, ${index}, ${card.id})">
+                        <div class="mastered-flash" id="flash-${index}"></div>
+                        
+                        <div class="card-front">
+                            <span class="category">${card.subject}</span>
+                            <div class="formula">${card.q}</div>
+                            <div class="hint">Double Tap to Master • Single Tap to Flip</div>
+                        </div>
+                        
+                        <div class="card-back">
+                            <span class="category">Explanation</span>
+                            <div class="derivation-text">${card.a}</div>
+                            <div class="hint">Tap to flip back</div>
+                        </div>
+                    </div>
+                </section>
+            `).join('');
+        }
+
+        let lastTap = 0;
+
+        function handleInteraction(e, index, cardId) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                masterCard(index, cardId);
+            } else {
+                setTimeout(() => {
+                    const newTime = new Date().getTime();
+                    if (newTime - lastTap >= 300) {
+                        toggleFlip(index);
+                    }
+                }, 300);
+            }
+            lastTap = currentTime;
+        }
+
+        function toggleFlip(index) {
+            document.getElementById(`card-${index}`).classList.toggle('is-flipped');
+        }
+
+        function masterCard(index, cardId) {
+            const flash = document.getElementById(`flash-${index}`);
+            flash.classList.add('active');
+            
+            let fullDeck = JSON.parse(localStorage.getItem('catalyst_deck')) || [];
+            const cardIndex = fullDeck.findIndex(c => c.id === cardId);
+            
+            if(cardIndex !== -1) {
+                fullDeck[cardIndex].mastered = true;
+                localStorage.setItem('catalyst_deck', JSON.stringify(fullDeck));
+            }
+
+            setTimeout(() => {
+                const front = document.querySelector(`#card-${index} .card-front`);
+                front.innerHTML = `<h2 style="color: #000;">Mastered</h2>`;
+                document.querySelector(`#card-${index}`).classList.remove('is-flipped');
+            }, 150);
+
+            setTimeout(() => {
+                if (index < totalCards - 1) {
+                    const nextSection = document.getElementById(`section-${index + 1}`);
+                    nextSection.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    initFeed(); 
+                }
+            }, 800);
+        }
+
+        window.onload = initFeed;
+    </script>
+</body>
+</html>
