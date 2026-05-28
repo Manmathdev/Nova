@@ -227,9 +227,9 @@
         const isNotMastered = !card.mastered;
         const matchesFilter = (activeFilter === 'All') || (card.subject === activeFilter);
         return isNotMastered && matchesFilter;
-    );
+    });
     
-    totalCards = activeDeck.length;
+    
 
     // ... [The rest of your existing initFeed code stays exactly the same] ...
 
