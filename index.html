@@ -121,6 +121,7 @@
             width: 100%;
         }
 
+        
         .stat-card {
             background: var(--card);
             padding: 18px;
@@ -132,16 +133,7 @@
         .stat-val { font-size: 1.1rem; font-weight: 700; color: #fff; }
 
         /* Action Button */
-        <div class="filter-section">
-    <span class="filter-label">Target Override</span>
-    <div class="filter-scroll">
-        <button class="filter-pill active" onclick="setFilter(this, 'All')">All Subjects</button>
-        <button class="filter-pill" onclick="setFilter(this, 'Physics')">Physics</button>
-        <button class="filter-pill" onclick="setFilter(this, 'Chemistry')">Chemistry</button>
-        <button class="filter-pill" onclick="setFilter(this, 'Maths')">Maths</button>
-        <button class="filter-pill" onclick="setFilter(this, 'IT')">IT</button>
-    </div>
-</div>
+        
         
         .btn-start {
             width: 100%;
@@ -238,6 +230,17 @@
         </div>
     </div>
 
+    <div class="filter-section">
+    <span class="filter-label">Target Override</span>
+    <div class="filter-scroll">
+        <button class="filter-pill active" onclick="setFilter(this, 'All')">All Subjects</button>
+        <button class="filter-pill" onclick="setFilter(this, 'Physics')">Physics</button>
+        <button class="filter-pill" onclick="setFilter(this, 'Chemistry')">Chemistry</button>
+        <button class="filter-pill" onclick="setFilter(this, 'Maths')">Maths</button>
+        <button class="filter-pill" onclick="setFilter(this, 'IT')">IT</button>
+    </div>
+    </div>
+    
     <button class="btn-start" onclick="window.location.href='pulse.html'">INITIATE FEED</button>
 
     <footer class="sys-footer">
