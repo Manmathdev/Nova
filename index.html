@@ -34,6 +34,53 @@
             align-items: center;
         }
 
+        /* Subject Filter UI */
+.filter-section {
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: auto; /* Pushes the start button down */
+}
+
+.filter-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    color: var(--text-s);
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    display: block;
+    padding-left: 5px;
+}
+
+.filter-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: none; /* Firefox */
+}
+
+.filter-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+.filter-pill {
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: transparent;
+    color: var(--text-s);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.filter-pill.active {
+    background: rgba(0, 255, 135, 0.1);
+    color: #00ff87;
+    border-color: #00ff87;
+}
+
         header { width: 100%; margin-bottom: 30px; }
         .logo { font-size: 0.55rem; letter-spacing: 5px; color: var(--text-s); text-transform: uppercase; margin-bottom: 6px; }
         h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
@@ -85,6 +132,17 @@
         .stat-val { font-size: 1.1rem; font-weight: 700; color: #fff; }
 
         /* Action Button */
+        <div class="filter-section">
+    <span class="filter-label">Target Override</span>
+    <div class="filter-scroll">
+        <button class="filter-pill active" onclick="setFilter(this, 'All')">All Subjects</button>
+        <button class="filter-pill" onclick="setFilter(this, 'Physics')">Physics</button>
+        <button class="filter-pill" onclick="setFilter(this, 'Chemistry')">Chemistry</button>
+        <button class="filter-pill" onclick="setFilter(this, 'Maths')">Maths</button>
+        <button class="filter-pill" onclick="setFilter(this, 'IT')">IT</button>
+    </div>
+</div>
+        
         .btn-start {
             width: 100%;
             margin-top: auto; 
@@ -180,7 +238,7 @@
         </div>
     </div>
 
-    <button class="btn-start" onclick="window.location.href='feed.html'">INITIATE FEED</button>
+    <button class="btn-start" onclick="window.location.href='pulse.html'">INITIATE FEED</button>
 
     <footer class="sys-footer">
         &copy; <span id="current-year"></span> NOVA. ALL RIGHTS RESERVED. CREATED BY MANMATH.
@@ -205,6 +263,19 @@
             circle.style.strokeDashoffset = offset;
         }
         document.getElementById('current-year').innerText = new Date().getFullYear();
+    // Set the default filter to 'All' when the app loads
+if(!localStorage.getItem('catalyst_filter')) {
+    localStorage.setItem('catalyst_filter', 'All');
+}
+
+function setFilter(btn, subject) {
+    // Visually update the pills
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Save the selection to memory
+    localStorage.setItem('catalyst_filter', subject);
+}
     </script>
 </body>
 </html>
